@@ -1,4 +1,4 @@
-## ** AI Voice & Chat Assistant **
+## **AI Voice & Chat Assistant**
 
 This project is a **bilingual AI assistant** that supports:
 
