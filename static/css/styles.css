@@ -1,0 +1,651 @@
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary-color: #f15a22; /* BOP Orange */
+  --secondary-color: #0c2340; /* Dark Navy Blue */
+  --accent-color: #ffc72c; /* Yellow/Gold Accent */
+  --text-color: #1a1a1a; /* Dark text */
+  --success-color: #4caf50; /* Standard green */
+  --error-color: #f44336; /* Standard red */
+  --gray-bg: #f7f7f7; /* Soft light gray background */
+  --glass-bg: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0.05)
+  );
+  --white-bg: #ffffff; /* Page background */
+}
+
+/* Overall Page Styles */
+body {
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(270deg, #f8f9fa, #e9ecef);
+  background-size: 400% 400%;
+  animation: bgAnim 10s ease infinite;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes bgAnim {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Header with logo */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 40px;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  height: 90px;
+  margin-right: 10px;
+}
+
+.logo-text {
+  color: #000;
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: 0.5px;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.logo-text:hover {
+  color: var(--accent-color);
+  transform: scale(1.05);
+}
+
+/* Main container */
+.container {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.card {
+  background: linear-gradient(135deg, #f15a22, /* BOP Orange */ #ff7a45);
+  border-radius: 16px;
+  padding: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  margin-bottom: 10px;
+  color: var(--light-text); /* White text */
+}
+
+.card-title {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.card-text {
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+/* Call button styles */
+#callButton {
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 50px;
+  background: var(--light-text);
+  color: var(--primary-color);
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: block;
+  margin: 20px auto;
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+}
+
+#callButton:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: shine 2s infinite;
+}
+
+#callButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+#callButton:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Enhanced Glassmorphism Effects for other cards if needed */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.125);
+  border-radius: 16px;
+  padding: 30px;
+  width: 100%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  transform: translateY(-5px) rotate(1deg);
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5),
+    0 12px 48px rgba(0, 0, 0, 0.2);
+}
+
+/* 3D Avatar Effects */
+.avatar-container {
+  perspective: 1000px;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 20px;
+}
+
+.avatar {
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease, box-shadow 0.3s ease;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+}
+
+.avatar:hover {
+  transform: rotateY(180deg);
+  box-shadow: 0 0 20px var(--accent-color);
+}
+
+/* Real-time Transcript Box */
+.transcript-box {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 15px;
+  transform: translateX(120%);
+  transition: transform 0.3s ease;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.transcript-box.visible {
+  transform: translateX(0);
+  animation: slideInBounce 0.5s ease-out;
+}
+
+.transcript-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.transcript-content {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+@keyframes slideInBounce {
+  0% {
+    transform: translateX(120%);
+  }
+  60% {
+    transform: translateX(-10%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Sentiment Indicator */
+.sentiment-indicator {
+  position: absolute;
+  bottom: 100px;
+  width: 200px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.sentiment-bar {
+  height: 100%;
+  width: 50%;
+  transition: all 0.3s ease;
+}
+
+.sentiment-label {
+  position: absolute;
+  top: -25px;
+  width: 100%;
+  text-align: center;
+  color: var(--light-text);
+  font-size: 0.8rem;
+}
+
+/* Call Controls */
+.call-controls {
+  position: fixed;
+  bottom: 30px;
+  display: flex;
+  gap: 15px;
+}
+
+.control-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--light-text);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+/* Ring box container */
+#ringBox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    var(--secondary-color) 0%,
+    var(--primary-color) 100%
+  );
+  display: none;
+  z-index: 9999;
+}
+
+/* Content wrapper for centering */
+.ring-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* Timer styling */
+.timer {
+  font-size: 3.5rem;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  margin: 20px 0;
+  display: none;
+  font-weight: 300;
+}
+
+/* Call status */
+.call-status {
+  font-size: 1.5rem;
+  color: white;
+  margin: 20px 0;
+  white-space: pre-line;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* End call button */
+#endCallBtn {
+  display: none;
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  background: var(--error-color);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 10000;
+  pointer-events: auto;
+  margin: 20px auto;
+  font-weight: 600;
+}
+
+#endCallBtn:hover {
+  background: #d32f2f;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+#endCallBtn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+#endCallBtn i {
+  margin-right: 10px;
+}
+
+/* Wave animations */
+.wave {
+  position: absolute;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  animation: waveAnim 2s infinite;
+}
+
+.wave:nth-child(2) {
+  animation-delay: 0.5s;
+}
+.wave:nth-child(3) {
+  animation-delay: 1s;
+}
+
+@keyframes waveAnim {
+  0% {
+    width: 0px;
+    height: 0px;
+    opacity: 0.8;
+  }
+  100% {
+    width: 400px;
+    height: 400px;
+    opacity: 0;
+  }
+}
+
+/* Sound Wave Animation */
+.sound-wave {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+}
+
+.sound-bar {
+  width: 5px;
+  height: 30px;
+  background: white;
+  animation: soundAnim 1s infinite;
+}
+
+.sound-bar:nth-child(1) {
+  animation-delay: 0s;
+}
+.sound-bar:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.sound-bar:nth-child(3) {
+  animation-delay: 0.4s;
+}
+.sound-bar:nth-child(4) {
+  animation-delay: 0.6s;
+}
+.sound-bar:nth-child(5) {
+  animation-delay: 0.8s;
+}
+
+@keyframes soundAnim {
+  0% {
+    height: 30px;
+  }
+  50% {
+    height: 60px;
+  }
+  100% {
+    height: 30px;
+  }
+}
+
+/* Loader Styles */
+.loader {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-dot {
+  width: 10px;
+  height: 10px;
+  background: white;
+  border-radius: 50%;
+  margin: 0 5px;
+  animation: bounce 0.6s infinite alternate;
+}
+
+.loader-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.loader-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  to {
+    transform: translateY(-10px);
+  }
+}
+
+/* Notification Styles */
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10000;
+}
+
+.notification {
+  padding: 15px 20px;
+  border-radius: 8px;
+  animation: slideIn 0.5s ease-out, fadeOut 0.5s ease-out 4.5s forwards;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.notification i {
+  margin-right: 10px;
+}
+
+.notification.success {
+  background: var(--success-color);
+  color: white;
+}
+
+.notification.error {
+  background: var(--error-color);
+  color: white;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+  }
+}
+
+.footer-div {
+  height: 15px;
+  margin-top: 10px;
+  width: 50%; /* Or any specific width like 300px */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 15px;
+  color: black;
+  font-size: 0.9rem;
+}
+
+.social-icon {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.5rem;
+  transition: color 0.3s ease;
+}
+
+.social-icon:hover {
+  color: var(--accent-color);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .header {
+    padding: 15px 20px;
+  }
+
+  .logo img {
+    height: 30px;
+  }
+
+  .logo-text {
+    font-size: 1.2rem;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .timer {
+    font-size: 2.5rem;
+  }
+
+  .avatar-container {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  #callButton {
+    font-size: 1rem;
+    padding: 12px 30px;
+  }
+
+  #endCallBtn {
+    font-size: 1rem;
+    padding: 12px 30px;
+  }
+
+  .card-title {
+    font-size: 1.3rem;
+  }
+
+  .avatar-container {
+    width: 80px;
+    height: 80px;
+  }
+
+  .avatar {
+    font-size: 2rem;
+  }
+}
+/* === CHAT-SPECIFIC OVERRIDES (add at the end of your styles.css) === */
+#typingIndicator {
+  display: none;
+  text-align: center;
+  color: white;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  margin: 10px 20px;
+  backdrop-filter: blur(5px);
+}

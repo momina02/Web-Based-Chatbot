@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BOP Chat</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='assets/favicon.ico') }}"
+      type="image/x-icon"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
+
+    <style>
+      /* General */
+      body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        background: #f0f2f5;
+      }
+
+      .header {
+        padding: 16px;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .logo-text {
+        color: #000;
+        font-weight: 700;
+        font-size: 1.5rem;
+        letter-spacing: 0.5px;
+        transition: color 0.3s ease, transform 0.3s ease;
+      }
+
+      .logo-text:hover {
+        color: var(--accent-color);
+        transform: scale(1.05);
+      }
+
+      /* Container */
+      .container {
+        max-width: 600px;
+        width: 95%;
+        margin: 20px auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .card {
+        background: linear-gradient(135deg, #f15a22, /* BOP Orange */ #ff7a45);
+        border-radius: 16px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 80vh;
+      }
+
+      .card-title {
+        padding: 16px;
+        text-align: center;
+        font-size: 22px;
+        color: white;
+      }
+
+      /* Chat box */
+      #chatBox {
+        flex: 1;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        gap: 14px;
+      }
+
+      #messages {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .message {
+        max-width: 75%;
+        padding: 12px 18px;
+        border-radius: 18px;
+        line-height: 1.5;
+        animation: fadeIn 0.35s ease;
+        word-wrap: break-word;
+      }
+
+      .message.user {
+        align-self: flex-end;
+        background: #f15a22;
+        color: white;
+        border-bottom-right-radius: 4px;
+        text-align: right; /* Align text to the right for user messages */
+      }
+
+      .message.bot {
+        align-self: flex-start;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border-bottom-left-radius: 4px;
+        text-align: left; /* Align text to the left for bot messages */
+      }
+
+      .message audio {
+        width: 200px;
+        margin-top: 6px;
+        border-radius: 8px;
+      }
+
+      /* Typing indicator */
+      #typingIndicator {
+        padding: 12px 16px;
+        display: none;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 18px;
+        width: fit-content;
+        border-bottom-left-radius: 4px;
+        align-self: flex-start;
+      }
+
+      .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: white;
+        margin: 0 3px;
+        animation: typingDots 1.4s infinite;
+        vertical-align: middle;
+      }
+
+      .dot:nth-child(1) {
+        animation-delay: 0s;
+      }
+      .dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes typingDots {
+        0%,
+        60%,
+        100% {
+          opacity: 0.3;
+          transform: translateY(0);
+        }
+        30% {
+          opacity: 1;
+          transform: translateY(-8px);
+        }
+      }
+      @media (max-width: 480px) {
+        .card-title {
+          font-size: 1.2rem;
+        }
+        #userInput {
+          font-size: 0.9rem;
+        }
+      }
+
+      /* Input area */
+      .chat-input-area {
+        display: flex;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.2);
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+      }
+
+      #userInput {
+        flex: 1;
+        padding: 14px 20px;
+        border: none;
+        border-radius: 30px;
+        background: white;
+        font-size: 1rem;
+      }
+
+      #userInput:focus {
+        outline: none;
+      }
+
+      .chat-input-area button {
+        margin-left: 12px;
+        width: 48px;
+        height: 48px;
+        border: none;
+        border-radius: 50%;
+        background: #f15a22;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+      }
+
+      .chat-input-area button:hover {
+        background: #d0481d;
+        transform: scale(1.1);
+      }
+
+      .voice-bubble {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.2);
+        max-width: 75%;
+      }
+
+      .message.user .voice-bubble {
+        color: white;
+        align-self: flex-end;
+      }
+
+      .voice-play-btn {
+        border: none;
+        background: transparent;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+      }
+
+      .voice-waveform {
+        display: flex;
+        gap: 2px;
+        align-items: flex-end;
+        height: 20px;
+        width: 100px;
+      }
+
+      .voice-waveform div {
+        flex: 1;
+        background: white; /* bar color */
+        height: 8px; /* base height */
+        border-radius: 2px;
+        animation: wave 1s infinite;
+        animation-play-state: paused;
+      }
+
+      /* Different animation delays for natural effect */
+      .voice-waveform div:nth-child(1) {
+        animation-delay: 0s;
+      }
+      .voice-waveform div:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+      .voice-waveform div:nth-child(3) {
+        animation-delay: 0.2s;
+      }
+      .voice-waveform div:nth-child(4) {
+        animation-delay: 0.3s;
+      }
+      .voice-waveform div:nth-child(5) {
+        animation-delay: 0.4s;
+      }
+
+      .voice-waveform.playing div {
+        animation-play-state: running;
+      }
+
+      @keyframes wave {
+        0%,
+        100% {
+          transform: scaleY(0.3);
+        }
+        50% {
+          transform: scaleY(1.2);
+        } /* slightly bigger for visible effect */
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="header">
+      <div class="logo">
+        <img
+          src="{{ url_for('static', filename='assets/logo.png') }}"
+          alt="Logo"
+        />
+        <span class="logo-text"></span>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="card">
+        <h1 class="card-title">AI-Powered Chat Support</h1>
+
+        <div id="chatBox">
+          <div
+            id="chatScroll"
+            style="
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              overflow-y: auto;
+              gap: 14px;
+            "
+          >
+            <div id="messages"></div>
+            <div id="typingIndicator">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+          </div>
+
+          <form id="chatForm" class="chat-input-area">
+            <input
+              type="text"
+              id="userInput"
+              placeholder="یہاں پیغام لکھیں یا مائیک دبا کر بولیں..."
+              autocomplete="off"
+            />
+            <button type="button" id="voiceBtn">
+              <i class="fas fa-microphone"></i>
+            </button>
+            <button type="submit" id="sendBtn" style="display: none">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const messages = document.getElementById("messages");
+      const form = document.getElementById("chatForm");
+      const input = document.getElementById("userInput");
+      const typing = document.getElementById("typingIndicator");
+      const voiceBtn = document.getElementById("voiceBtn");
+      const sendBtn = document.getElementById("sendBtn");
+
+      const chatScroll = document.getElementById("chatScroll");
+
+      function scrollToBottom() {
+        chatScroll.scrollTop = chatScroll.scrollHeight;
+      }
+
+      let recorder,
+        audioChunks = [];
+
+      marked.setOptions({ breaks: true, gfm: true });
+
+      function addMessage(content, sender, audioUrl = null) {
+        const div = document.createElement("div");
+        div.className = `message ${sender}`;
+
+        if (audioUrl) {
+          // Create a voice note bubble
+          const audioBubble = document.createElement("div");
+          audioBubble.className = "voice-bubble";
+
+          // Play button
+          const playBtn = document.createElement("button");
+          playBtn.className = "voice-play-btn";
+          playBtn.innerHTML = `<i class="fas fa-play"></i>`;
+
+          // Hidden audio
+          const audio = document.createElement("audio");
+          audio.src = audioUrl;
+          audio.preload = "auto";
+
+          // Waveform container
+          const waveform = document.createElement("div");
+          waveform.className = "voice-waveform";
+
+          playBtn.addEventListener("click", () => {
+            if (audio.paused) {
+              audio.play();
+              playBtn.innerHTML = `<i class="fas fa-pause"></i>`;
+              waveform.classList.add("playing");
+            } else {
+              audio.pause();
+              playBtn.innerHTML = `<i class="fas fa-play"></i>`;
+              waveform.classList.remove("playing");
+            }
+          });
+
+          audio.addEventListener("ended", () => {
+            playBtn.innerHTML = `<i class="fas fa-play"></i>`;
+            waveform.classList.remove("playing");
+          });
+
+          audioBubble.appendChild(playBtn);
+          audioBubble.appendChild(waveform);
+          div.appendChild(audioBubble);
+        }
+
+        if (content && content.trim() && !audioUrl) {
+          if (sender === "bot") div.innerHTML = marked.parse(content);
+          else div.textContent = content;
+        }
+
+        messages.appendChild(div);
+        scrollToBottom(); // Keep chat scrolled to bottom
+      }
+
+      function showTyping() {
+        typing.style.display = "block";
+        scrollToBottom(); // ✅ Scroll to typing indicator
+      }
+
+      function hideTyping() {
+        typing.style.display = "none";
+        scrollToBottom(); // ✅ Scroll after typing disappears
+      }
+
+      input.addEventListener("input", () => {
+        if (input.value.trim()) {
+          voiceBtn.style.display = "none";
+          sendBtn.style.display = "block";
+        } else {
+          voiceBtn.style.display = "block";
+          sendBtn.style.display = "none";
+        }
+      });
+
+      // Text submit
+
+      // Text submit
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!input.value.trim()) return;
+        const userText = input.value;
+        addMessage(userText, "user");
+        input.value = "";
+        voiceBtn.style.display = "block";
+        sendBtn.style.display = "none";
+
+        // Scroll to bottom immediately
+        messages.scrollTop = messages.scrollHeight;
+
+        showTyping();
+        try {
+          const res = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: userText }),
+          });
+          const data = await res.json();
+          hideTyping();
+          addMessage(data.reply, "bot");
+        } catch (err) {
+          hideTyping();
+          addMessage("معاف کیجیے، کوئی مسئلہ ہو گیا ہے۔", "bot");
+        }
+      });
+
+      // Voice recording
+      async function startRecording() {
+        try {
+          audioChunks = [];
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+          });
+          recorder = new MediaRecorder(stream);
+          recorder.ondataavailable = (e) => audioChunks.push(e.data);
+          recorder.start();
+
+          voiceBtn.style.background = "#e63946"; // Red while recording
+          voiceBtn.innerHTML = '<i class="fas fa-stop"></i>';
+        } catch (err) {
+          alert("مائیک تک رسائی نہیں مل سکی۔");
+        }
+      }
+
+      function stopRecording() {
+        if (recorder && recorder.state === "recording") {
+          // Set onstop first
+          recorder.onstop = async () => {
+            const blob = new Blob(audioChunks, { type: "audio/webm" });
+            const userAudioUrl = URL.createObjectURL(blob);
+            addMessage("", "user", userAudioUrl);
+
+            // Scroll to bottom
+            messages.scrollTop = messages.scrollHeight;
+
+            showTyping();
+            const formData = new FormData();
+            formData.append("audio", blob, "voice.webm");
+
+            try {
+              const res = await fetch("/voice", {
+                method: "POST",
+                body: formData,
+              });
+              const data = await res.json();
+              hideTyping();
+              if (data.reply || data.audio_url)
+                addMessage(data.reply || "", "bot", data.audio_url);
+              else addMessage("آڈیو سمجھنے میں مسئلہ ہوا۔", "bot");
+            } catch (err) {
+              hideTyping();
+              addMessage("آڈیو بھیجنے میں ناکامی۔", "bot");
+            }
+          };
+
+          recorder.stop(); // Now stop triggers onstop
+          recorder.stream.getTracks().forEach((t) => t.stop());
+          voiceBtn.style.background = "#f15a22";
+          voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+        }
+      }
+
+      voiceBtn.addEventListener("click", async () => {
+        if (recorder && recorder.state === "recording") stopRecording();
+        else await startRecording();
+      });
+
+      // Initial bot greeting
+      window.onload = () => {
+        addMessage(
+          "سلام! میں بینک آف پنجاب کا AI اسسٹنٹ ہوں۔ آپ کی کیا مدد کر سکتا ہوں؟",
+          "bot"
+        );
+      };
+    </script>
+  </body>
+</html>
