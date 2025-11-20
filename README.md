@@ -1,6 +1,6 @@
 ## ** AI Voice & Chat Assistant **
 
-This project is a **bilingual AI assistant** for **The Bank of Punjab (BOP)** that supports:
+This project is a **bilingual AI assistant** that supports:
 
 ✅ **Text chat** (Urdu + English + Roman Urdu)
 ✅ **Voice chat** (Speech-to-Text + AI reply + Text-to-Speech)
