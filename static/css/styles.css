@@ -96,7 +96,7 @@ body {
 }
 
 .card {
-  background: linear-gradient(135deg, #f15a22, /* BOP Orange */ #ff7a45);
+  background: linear-gradient(135deg, #006400, #228b22);
   border-radius: 16px;
   padding: 10px;
   margin-left: 10px;
@@ -105,7 +105,7 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   text-align: center;
   margin-bottom: 10px;
-  color: var(--light-text); /* White text */
+  color: var(--light-text);
 }
 
 .card-title {

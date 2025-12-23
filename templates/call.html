@@ -2,12 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BOP Chat</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/styles.css') }}"
+    <!-- Prevents zoom issues on mobile inputs + full responsiveness -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
+    <title>Vital Tea AI Chat</title>
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -24,242 +25,157 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
 
     <style>
-      /* General */
-      body {
+      /* Reset & Base */
+      * {
         margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
         font-family: "Poppins", sans-serif;
         background: #f0f2f5;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
       }
 
+      /* Header */
       .header {
-        padding: 16px;
-        color: white;
+        background: white;
+        padding: 12px 16px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         display: flex;
         align-items: center;
         gap: 12px;
+        flex-shrink: 0;
+        z-index: 10;
+      }
+      .header img {
+        height: 40px;
       }
       .logo-text {
-        color: #000;
         font-weight: 700;
-        font-size: 1.5rem;
-        letter-spacing: 0.5px;
-        transition: color 0.3s ease, transform 0.3s ease;
+        font-size: 1.4rem;
+        color: #000;
       }
 
-      .logo-text:hover {
-        color: var(--accent-color);
-        transform: scale(1.05);
-      }
-
-      /* Container */
+      /* Main Layout */
       .container {
+        flex: 1;
         max-width: 600px;
-        width: 95%;
-        margin: 20px auto;
+        width: 100%;
+        margin: 0 auto;
+        padding: 10px;
         display: flex;
         flex-direction: column;
       }
 
       .card {
-        background: linear-gradient(135deg, #f15a22, /* BOP Orange */ #ff7a45);
+        background: linear-gradient(
+          135deg,
+          #006400,
+          #228b22
+        ); /* Vital Tea fresh green */
         border-radius: 16px;
         overflow: hidden;
         display: flex;
         flex-direction: column;
-        height: 80vh;
+        flex: 1;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
       }
 
       .card-title {
         padding: 16px;
         text-align: center;
-        font-size: 22px;
+        font-size: 1.4rem;
         color: white;
+        margin: 0;
+        flex-shrink: 0;
       }
 
-      /* Chat box */
+      /* Chat Area */
       #chatBox {
         flex: 1;
-        padding: 16px;
         display: flex;
         flex-direction: column;
+        padding: 0 16px 10px;
+      }
+
+      #chatScroll {
+        flex: 1;
         overflow-y: auto;
+        display: flex;
+        flex-direction: column;
         gap: 14px;
+        padding: 10px 0;
       }
 
       #messages {
-        flex: 1;
         display: flex;
         flex-direction: column;
         gap: 14px;
       }
 
       .message {
-        max-width: 75%;
+        max-width: 80%;
         padding: 12px 18px;
         border-radius: 18px;
         line-height: 1.5;
-        animation: fadeIn 0.35s ease;
         word-wrap: break-word;
+        animation: fadeIn 0.3s ease;
       }
 
       .message.user {
         align-self: flex-end;
-        background: #f15a22;
+        background: #228b22;
         color: white;
         border-bottom-right-radius: 4px;
-        text-align: right; /* Align text to the right for user messages */
       }
 
       .message.bot {
         align-self: flex-start;
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.25);
         color: white;
         border-bottom-left-radius: 4px;
-        text-align: left; /* Align text to the left for bot messages */
+        backdrop-filter: blur(8px);
       }
 
-      .message audio {
-        width: 200px;
-        margin-top: 6px;
-        border-radius: 8px;
-      }
-
-      /* Typing indicator */
-      #typingIndicator {
-        padding: 12px 16px;
-        display: none;
-        background: rgba(255, 255, 255, 0.3);
-        border-radius: 18px;
-        width: fit-content;
-        border-bottom-left-radius: 4px;
-        align-self: flex-start;
-      }
-
-      .dot {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background-color: white;
-        margin: 0 3px;
-        animation: typingDots 1.4s infinite;
-        vertical-align: middle;
-      }
-
-      .dot:nth-child(1) {
-        animation-delay: 0s;
-      }
-      .dot:nth-child(2) {
-        animation-delay: 0.2s;
-      }
-      .dot:nth-child(3) {
-        animation-delay: 0.4s;
-      }
-
-      @keyframes typingDots {
-        0%,
-        60%,
-        100% {
-          opacity: 0.3;
-          transform: translateY(0);
-        }
-        30% {
-          opacity: 1;
-          transform: translateY(-8px);
-        }
-      }
-      @media (max-width: 480px) {
-        .card-title {
-          font-size: 1.2rem;
-        }
-        #userInput {
-          font-size: 0.9rem;
-        }
-      }
-
-      /* Input area */
-      .chat-input-area {
-        display: flex;
-        padding: 15px;
-        background: rgba(255, 255, 255, 0.2);
-        border-top: 1px solid rgba(255, 255, 255, 0.15);
-      }
-
-      #userInput {
-        flex: 1;
-        padding: 14px 20px;
-        border: none;
-        border-radius: 30px;
-        background: white;
-        font-size: 1rem;
-      }
-
-      #userInput:focus {
-        outline: none;
-      }
-
-      .chat-input-area button {
-        margin-left: 12px;
-        width: 48px;
-        height: 48px;
-        border: none;
-        border-radius: 50%;
-        background: #f15a22;
-        color: white;
-        cursor: pointer;
-        transition: 0.3s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-      }
-
-      .chat-input-area button:hover {
-        background: #d0481d;
-        transform: scale(1.1);
-      }
-
+      /* Voice Bubble */
       .voice-bubble {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
         padding: 10px 14px;
         border-radius: 18px;
         background: rgba(255, 255, 255, 0.2);
-        max-width: 75%;
-      }
-
-      .message.user .voice-bubble {
-        color: white;
-        align-self: flex-end;
+        max-width: 80%;
       }
 
       .voice-play-btn {
-        border: none;
         background: transparent;
+        border: none;
         color: white;
-        font-size: 18px;
+        font-size: 20px;
         cursor: pointer;
       }
 
       .voice-waveform {
         display: flex;
-        gap: 2px;
+        gap: 3px;
         align-items: flex-end;
-        height: 20px;
+        height: 24px;
         width: 100px;
       }
 
       .voice-waveform div {
         flex: 1;
-        background: white; /* bar color */
-        height: 8px; /* base height */
+        background: white;
         border-radius: 2px;
-        animation: wave 1s infinite;
+        animation: wave 1.2s infinite ease-in-out;
         animation-play-state: paused;
       }
 
-      /* Different animation delays for natural effect */
       .voice-waveform div:nth-child(1) {
         animation-delay: 0s;
       }
@@ -283,11 +199,54 @@
       @keyframes wave {
         0%,
         100% {
-          transform: scaleY(0.3);
+          transform: scaleY(0.4);
         }
         50% {
-          transform: scaleY(1.2);
-        } /* slightly bigger for visible effect */
+          transform: scaleY(1);
+        }
+      }
+
+      /* Typing Indicator */
+      #typingIndicator {
+        align-self: flex-start;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 18px;
+        border-bottom-left-radius: 4px;
+        display: none;
+      }
+
+      .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: white;
+        border-radius: 50%;
+        margin: 0 3px;
+        animation: typingDots 1.4s infinite;
+      }
+
+      .dot:nth-child(1) {
+        animation-delay: 0s;
+      }
+      .dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes typingDots {
+        0%,
+        60%,
+        100% {
+          opacity: 0.4;
+          transform: translateY(0);
+        }
+        30% {
+          opacity: 1;
+          transform: translateY(-6px);
+        }
       }
 
       @keyframes fadeIn {
@@ -300,6 +259,89 @@
           transform: none;
         }
       }
+
+      /* Input Area */
+      .chat-input-area {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 30px;
+        margin-top: 10px;
+        padding: 8px 12px;
+        flex-shrink: 0;
+      }
+
+      #userInput {
+        flex: 1;
+        padding: 14px 18px;
+        border: none;
+        border-radius: 30px;
+        background: white;
+        font-size: 1rem;
+      }
+
+      #userInput:focus {
+        outline: none;
+      }
+
+      .chat-input-area button {
+        width: 50px;
+        height: 50px;
+        border: none;
+        border-radius: 50%;
+        background: #006400;
+        color: white;
+        cursor: pointer;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .chat-input-area button:hover {
+        background: #004d00;
+      }
+
+      /* Mobile Optimizations */
+      @media (max-width: 480px) {
+        .header {
+          padding: 10px 12px;
+        }
+        .header img {
+          height: 36px;
+        }
+        .logo-text {
+          font-size: 1.2rem;
+        }
+        .container {
+          padding: 6px;
+        }
+        .card-title {
+          font-size: 1.2rem;
+          padding: 12px;
+        }
+        .message {
+          max-width: 85%;
+          padding: 10px 14px;
+          font-size: 0.95rem;
+        }
+        #userInput {
+          font-size: 16px; /* Critical: prevents iOS zoom */
+          padding: 12px 16px;
+        }
+        .chat-input-area button {
+          width: 46px;
+          height: 46px;
+          font-size: 18px;
+        }
+        .voice-waveform {
+          width: 80px;
+          height: 20px;
+        }
+      }
     </style>
   </head>
 
@@ -308,27 +350,18 @@
       <div class="logo">
         <img
           src="{{ url_for('static', filename='assets/logo.png') }}"
-          alt="Logo"
+          alt="Vital Tea Logo"
         />
-        <span class="logo-text"></span>
+        <span class="logo-text">Vital Tea</span>
       </div>
     </header>
 
     <div class="container">
       <div class="card">
-        <h1 class="card-title">AI-Powered Chat Support</h1>
+        <h1 class="card-title">AI Chat Assistant</h1>
 
         <div id="chatBox">
-          <div
-            id="chatScroll"
-            style="
-              flex: 1;
-              display: flex;
-              flex-direction: column;
-              overflow-y: auto;
-              gap: 14px;
-            "
-          >
+          <div id="chatScroll">
             <div id="messages"></div>
             <div id="typingIndicator">
               <span class="dot"></span>
@@ -362,7 +395,6 @@
       const typing = document.getElementById("typingIndicator");
       const voiceBtn = document.getElementById("voiceBtn");
       const sendBtn = document.getElementById("sendBtn");
-
       const chatScroll = document.getElementById("chatScroll");
 
       function scrollToBottom() {
@@ -379,23 +411,23 @@
         div.className = `message ${sender}`;
 
         if (audioUrl) {
-          // Create a voice note bubble
           const audioBubble = document.createElement("div");
           audioBubble.className = "voice-bubble";
 
-          // Play button
           const playBtn = document.createElement("button");
           playBtn.className = "voice-play-btn";
           playBtn.innerHTML = `<i class="fas fa-play"></i>`;
 
-          // Hidden audio
           const audio = document.createElement("audio");
           audio.src = audioUrl;
           audio.preload = "auto";
 
-          // Waveform container
           const waveform = document.createElement("div");
           waveform.className = "voice-waveform";
+          for (let i = 0; i < 5; i++) {
+            const bar = document.createElement("div");
+            waveform.appendChild(bar);
+          }
 
           playBtn.addEventListener("click", () => {
             if (audio.paused) {
@@ -425,43 +457,38 @@
         }
 
         messages.appendChild(div);
-        scrollToBottom(); // Keep chat scrolled to bottom
+        scrollToBottom();
       }
 
       function showTyping() {
         typing.style.display = "block";
-        scrollToBottom(); // ✅ Scroll to typing indicator
+        scrollToBottom();
       }
 
       function hideTyping() {
         typing.style.display = "none";
-        scrollToBottom(); // ✅ Scroll after typing disappears
+        scrollToBottom();
       }
 
       input.addEventListener("input", () => {
         if (input.value.trim()) {
           voiceBtn.style.display = "none";
-          sendBtn.style.display = "block";
+          sendBtn.style.display = "flex";
         } else {
-          voiceBtn.style.display = "block";
+          voiceBtn.style.display = "flex";
           sendBtn.style.display = "none";
         }
       });
 
-      // Text submit
-
-      // Text submit
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         if (!input.value.trim()) return;
+
         const userText = input.value;
         addMessage(userText, "user");
         input.value = "";
-        voiceBtn.style.display = "block";
+        voiceBtn.style.display = "flex";
         sendBtn.style.display = "none";
-
-        // Scroll to bottom immediately
-        messages.scrollTop = messages.scrollHeight;
 
         showTyping();
         try {
@@ -479,7 +506,6 @@
         }
       });
 
-      // Voice recording
       async function startRecording() {
         try {
           audioChunks = [];
@@ -490,7 +516,7 @@
           recorder.ondataavailable = (e) => audioChunks.push(e.data);
           recorder.start();
 
-          voiceBtn.style.background = "#e63946"; // Red while recording
+          voiceBtn.style.background = "#32CD32"; // Lime green while recording
           voiceBtn.innerHTML = '<i class="fas fa-stop"></i>';
         } catch (err) {
           alert("مائیک تک رسائی نہیں مل سکی۔");
@@ -499,14 +525,10 @@
 
       function stopRecording() {
         if (recorder && recorder.state === "recording") {
-          // Set onstop first
           recorder.onstop = async () => {
             const blob = new Blob(audioChunks, { type: "audio/webm" });
             const userAudioUrl = URL.createObjectURL(blob);
             addMessage("", "user", userAudioUrl);
-
-            // Scroll to bottom
-            messages.scrollTop = messages.scrollHeight;
 
             showTyping();
             const formData = new FormData();
@@ -519,31 +541,36 @@
               });
               const data = await res.json();
               hideTyping();
-              if (data.reply || data.audio_url)
+              if (data.reply || data.audio_url) {
                 addMessage(data.reply || "", "bot", data.audio_url);
-              else addMessage("آڈیو سمجھنے میں مسئلہ ہوا۔", "bot");
+              } else {
+                addMessage("آڈیو سمجھنے میں مسئلہ ہوا۔", "bot");
+              }
             } catch (err) {
               hideTyping();
               addMessage("آڈیو بھیجنے میں ناکامی۔", "bot");
             }
           };
 
-          recorder.stop(); // Now stop triggers onstop
+          recorder.stop();
           recorder.stream.getTracks().forEach((t) => t.stop());
-          voiceBtn.style.background = "#f15a22";
+          voiceBtn.style.background = "#006400";
           voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
         }
       }
 
-      voiceBtn.addEventListener("click", async () => {
-        if (recorder && recorder.state === "recording") stopRecording();
-        else await startRecording();
+      voiceBtn.addEventListener("click", () => {
+        if (recorder && recorder.state === "recording") {
+          stopRecording();
+        } else {
+          startRecording();
+        }
       });
 
-      // Initial bot greeting
+      // Updated greeting for Vital Tea
       window.onload = () => {
         addMessage(
-          "سلام! میں بینک آف پنجاب کا AI اسسٹنٹ ہوں۔ آپ کی کیا مدد کر سکتا ہوں؟",
+          "سلام! میں وائٹل ٹی کیفے سے ہوں۔ آج میں آپ کی مدد کیسے کر سکتا ہوں؟",
           "bot"
         );
       };
