@@ -2,7 +2,6 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- Prevents zoom issues on mobile inputs + full responsiveness -->
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
@@ -25,15 +24,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
 
     <style>
-      /* Reset & Base */
-
-      /* Add these lines - fixes full height layout */
       html,
       body {
         height: 100%;
         margin: 0;
         padding: 0;
-        overflow: hidden; /* Prevents double scrollbars */
+        overflow: hidden;
       }
 
       * {
@@ -50,7 +46,6 @@
         overflow: hidden;
       }
 
-      /* Header */
       .header {
         background: white;
         padding: 12px 16px;
@@ -78,7 +73,7 @@
         padding: 10px;
         display: flex;
         flex-direction: column;
-        height: 0; /* Critical fix */
+        height: 0;
         min-height: 0;
       }
 
@@ -102,12 +97,11 @@
         flex-shrink: 0;
       }
 
-      /* Chat Area */
       #chatBox {
         flex: 1;
         display: flex;
         flex-direction: column;
-        min-height: 0; /* Critical for nested flex */
+        min-height: 0;
       }
 
       #chatScroll {
@@ -117,10 +111,9 @@
         display: flex;
         flex-direction: column;
         min-height: 0;
-        padding: 10px 16px; /* Consistent padding with input */
+        padding: 10px 16px;
       }
 
-      /* Subtle scrollbar (visible on desktop, hidden on mobile) */
       #chatScroll::-webkit-scrollbar {
         width: 6px;
       }
@@ -167,7 +160,6 @@
         backdrop-filter: blur(8px);
       }
 
-      /* Voice Bubble */
       .voice-bubble {
         display: flex;
         align-items: center;
@@ -232,7 +224,6 @@
         }
       }
 
-      /* Typing Indicator */
       #typingIndicator {
         align-self: flex-start;
         padding: 12px 16px;
@@ -286,7 +277,6 @@
         }
       }
 
-      /* Input Area */
       .chat-input-area {
         display: flex;
         align-items: center;
@@ -294,8 +284,8 @@
         padding: 8px 12px;
         background: rgba(255, 255, 255, 0.15);
         border-radius: 30px;
-        margin: 10px 16px 16px 16px; /* Better spacing, no top-only margin */
-        flex-shrink: 0; /* Ensures it never shrinks */
+        margin: 10px 16px 16px 16px;
+        flex-shrink: 0;
       }
 
       #userInput {
@@ -330,7 +320,6 @@
         background: #004d00;
       }
 
-      /* Mobile Optimizations */
       @media (max-width: 480px) {
         .header {
           padding: 10px 12px;
@@ -354,7 +343,7 @@
           font-size: 0.95rem;
         }
         #userInput {
-          font-size: 16px; /* Prevents iOS zoom */
+          font-size: 16px;
           padding: 12px 16px;
         }
         .chat-input-area button {
@@ -422,9 +411,11 @@
       const sendBtn = document.getElementById("sendBtn");
       const chatScroll = document.getElementById("chatScroll");
 
+      // ⭐ SESSION MANAGEMENT - This fixes the loop issue!
+      let sessionId = null;
+
       function scrollToBottom() {
         chatScroll.scrollTop = chatScroll.scrollHeight;
-        // Small fix for some mobile browsers
         setTimeout(() => {
           chatScroll.scrollTop = chatScroll.scrollHeight;
         }, 100);
@@ -509,6 +500,7 @@
         }
       });
 
+      // ⭐ FIXED TEXT CHAT - Now includes session_id
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         if (!input.value.trim()) return;
@@ -524,9 +516,18 @@
           const res = await fetch("/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: userText }),
+            body: JSON.stringify({
+              message: userText,
+              session_id: sessionId, // ⭐ Send session ID
+            }),
           });
           const data = await res.json();
+
+          // ⭐ Store session ID from response
+          if (data.session_id) {
+            sessionId = data.session_id;
+          }
+
           hideTyping();
           addMessage(data.reply, "bot");
         } catch (err) {
@@ -545,13 +546,14 @@
           recorder.ondataavailable = (e) => audioChunks.push(e.data);
           recorder.start();
 
-          voiceBtn.style.background = "#32CD32"; // Lime green while recording
+          voiceBtn.style.background = "#32CD32";
           voiceBtn.innerHTML = '<i class="fas fa-stop"></i>';
         } catch (err) {
           alert("مائیک تک رسائی نہیں مل سکی۔");
         }
       }
 
+      // ⭐ FIXED VOICE CHAT - Now includes session_id
       function stopRecording() {
         if (recorder && recorder.state === "recording") {
           recorder.onstop = async () => {
@@ -563,12 +565,23 @@
             const formData = new FormData();
             formData.append("audio", blob, "voice.webm");
 
+            // ⭐ Add session ID to form data
+            if (sessionId) {
+              formData.append("session_id", sessionId);
+            }
+
             try {
               const res = await fetch("/voice", {
                 method: "POST",
                 body: formData,
               });
               const data = await res.json();
+
+              // ⭐ Store session ID from response
+              if (data.session_id) {
+                sessionId = data.session_id;
+              }
+
               hideTyping();
               if (data.reply || data.audio_url) {
                 addMessage(data.reply || "", "bot", data.audio_url);
@@ -596,7 +609,6 @@
         }
       });
 
-      // Updated greeting for Vital Tea
       window.onload = () => {
         addMessage(
           "سلام! میں وائٹل ٹی کیفے سے ہوں۔ آج میں آپ کی مدد کیسے کر سکتا ہوں؟",
