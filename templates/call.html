@@ -26,6 +26,16 @@
 
     <style>
       /* Reset & Base */
+
+      /* Add these lines - fixes full height layout */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden; /* Prevents double scrollbars */
+      }
+
       * {
         margin: 0;
         padding: 0;
@@ -60,7 +70,6 @@
         color: #000;
       }
 
-      /* Main Layout */
       .container {
         flex: 1;
         max-width: 600px;
@@ -69,19 +78,18 @@
         padding: 10px;
         display: flex;
         flex-direction: column;
+        height: 0; /* Critical fix */
+        min-height: 0;
       }
 
       .card {
-        background: linear-gradient(
-          135deg,
-          #006400,
-          #228b22
-        ); /* Vital Tea fresh green */
+        background: linear-gradient(135deg, #006400, #228b22);
         border-radius: 16px;
         overflow: hidden;
         display: flex;
         flex-direction: column;
         flex: 1;
+        min-height: 0;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
       }
 
@@ -99,19 +107,37 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-        padding: 0 16px 10px;
+        min-height: 0; /* Critical for nested flex */
       }
 
       #chatScroll {
         flex: 1;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         display: flex;
         flex-direction: column;
-        gap: 14px;
-        padding: 10px 0;
+        min-height: 0;
+        padding: 10px 16px; /* Consistent padding with input */
+      }
+
+      /* Subtle scrollbar (visible on desktop, hidden on mobile) */
+      #chatScroll::-webkit-scrollbar {
+        width: 6px;
+      }
+      #chatScroll::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      #chatScroll::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.4);
+        border-radius: 3px;
+      }
+      #chatScroll::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.7);
       }
 
       #messages {
+        flex: 1;
+        min-height: 0;
         display: flex;
         flex-direction: column;
         gap: 14px;
@@ -265,12 +291,11 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        padding: 10px 0;
+        padding: 8px 12px;
         background: rgba(255, 255, 255, 0.15);
         border-radius: 30px;
-        margin-top: 10px;
-        padding: 8px 12px;
-        flex-shrink: 0;
+        margin: 10px 16px 16px 16px; /* Better spacing, no top-only margin */
+        flex-shrink: 0; /* Ensures it never shrinks */
       }
 
       #userInput {
@@ -329,7 +354,7 @@
           font-size: 0.95rem;
         }
         #userInput {
-          font-size: 16px; /* Critical: prevents iOS zoom */
+          font-size: 16px; /* Prevents iOS zoom */
           padding: 12px 16px;
         }
         .chat-input-area button {
@@ -399,6 +424,10 @@
 
       function scrollToBottom() {
         chatScroll.scrollTop = chatScroll.scrollHeight;
+        // Small fix for some mobile browsers
+        setTimeout(() => {
+          chatScroll.scrollTop = chatScroll.scrollHeight;
+        }, 100);
       }
 
       let recorder,
